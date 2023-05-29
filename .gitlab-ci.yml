@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy
+
+
+variables:
+  KUBE_CONTEXT: srinivasboini/spirngcloud/gitlab-terraform-gke:gke-agent
+
+
+
+
+.kube-context:
+  before_script:
+    - if [ -n "$KUBE_CONTEXT" ]; then kubectl config use-context "$KUBE_CONTEXT"; fi
+
+deploy:
+  stage: deploy
+  when: manual
+  extends: .kube-context
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
+  script:
+    - kubectl config get-contexts
+    - kubectl apply -f ./postgres/postgres.yaml
+    - kubectl apply -f ./postgres/postgres-ingress-route.yaml
+
+
